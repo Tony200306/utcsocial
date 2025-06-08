@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Socket.IO Client</title>
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    #status {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Socket.IO Client</h1>
+  <p>Status: <span id="status">Disconnected</span></p>
+  <button id="connectBtn">Connect</button>
+  <button id="sendBtn" disabled>Send Message</button>
+
+  <div id="messages"></div>
+
+  <script>
+    let socket;
+
+    const statusEl = document.getElementById("status");
+    const connectBtn = document.getElementById("connectBtn");
+    const sendBtn = document.getElementById("sendBtn");
+    const messagesEl = document.getElementById("messages");
+
+    // Kết nối đến server
+    connectBtn.addEventListener("click", () => {
+      if (!socket || socket.disconnected) {
+
+   
+
+        socket = io("http://localhost:5000");
+
+        socket.on("connect", () => {
+          statusEl.textContent = "Connected";
+          statusEl.style.color = "green";
+          sendBtn.disabled = false;
+        });
+
+        socket.on("disconnect", () => {
+          statusEl.textContent = "Disconnected";
+          statusEl.style.color = "red";
+          sendBtn.disabled = true;
+        });
+
+        // Lắng nghe sự kiện từ server
+        socket.on("message", (message) => {
+          const messageEl = document.createElement("p");
+          messageEl.textContent = `Server: ${message}`;
+          messagesEl.appendChild(messageEl);
+        });
+
+        socket.on("connect_error", (err) => {
+            console.error("Connection error:", err.message);
+          });
+      }
+    });
+
+    // Gửi tin nhắn đến server
+    sendBtn.addEventListener("click", () => {
+      if (socket && socket.connected) {
+        const message = "Client says hi!";
+        socket.emit("message", message);
+        const messageEl = document.createElement("p");
+        messageEl.textContent = `You: ${message}`;
+        messagesEl.appendChild(messageEl);
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+{
+  "extends": [
+    "next/core-web-vitals",
+    "next",
+    "standard",
+    "plugin:tailwindcss/recommended",
+    "prettier"
+  ],
+  "plugins": [
+    "tailwindcss"
+  ],
+  "rules": {
+    "no-undef": "off",
+    "react/no-unknown-property": [
+      "warn",
+      {
+        "ignore": [
+          "className"
+        ]
+      }
+    ],
+    "tailwindcss/classnames-order": "warn"
+  },
+  "settings": {
+    "tailwindcss": {}
+  }
+}

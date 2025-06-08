@@ -1,0 +1,22 @@
+/* .scrollbar-container.cs-message-list__scroll-wrapper{
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+} */
+
+.imageMess{
+  width: 23% !important;
+  display: flex !important;
+  align-items: flex-end;
+  margin-top: 10px !important;
+  margin-bottom: 10px !important;
+}
+
+.imageMess.cs-message {
+  display: flex;
+  flex-direction: column !important;
+  align-items: flex-end;
+}
+.cs-message__content-wrapper{
+  justify-content: center !important;
+}
