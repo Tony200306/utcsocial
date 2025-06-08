@@ -1,6 +1,5 @@
 "use client";
 
-import type { Metadata } from "next";
 import Bottombar from "@/components/shared/Bottombar";
 import { Layout } from "@/components/custom/layout";
 import { Input } from "@/components/ui/input";
@@ -18,9 +17,6 @@ import {
   IconUser,
 } from "@tabler/icons-react";
 import useUserStore from "@/store/useUserStore";
-export const metadata: Metadata = {
-  title: "Threads",
-};
 
 export default function RootLayout({
   children,
@@ -28,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const user = useUserStore((state) => state.user);
- console.log("user", user);
+  console.log("user", user);
   return (
     <>
       <main className="flex flex-row">

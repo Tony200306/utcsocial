@@ -6,13 +6,8 @@ import RightSidebar from "@/components/shared/RightSidebar";
 import Topbar from "@/components/shared/Topbar";
 import { Toaster } from "@/components/ui/toaster";
 import useUserStore from "@/store/useUserStore";
-import type { Metadata } from "next";
 import React, { useEffect } from "react";
 import { FollowProvider } from "../../Context/Context";
-
-export const metadata: Metadata = {
-  title: "Threads",
-};
 
 export default function RootLayout({
   children,

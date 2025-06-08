@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect } from "react";
-import type { Metadata } from "next";
+
 import LeftSidebar from "@/components/shared/LeftSidebar";
 import Bottombar from "@/components/shared/Bottombar";
 import RightSidebar from "@/components/shared/RightSidebar";
@@ -9,10 +9,6 @@ import useUserStore from "@/store/useUserStore";
 import { CreateThreadCard } from "@/components/cards/CreateThreadCard";
 import { Toaster } from "@/components/ui/toaster";
 import {  FollowProvider } from "../../Context/Context";
-
-export const metadata: Metadata = {
-  title: "Threads",
-};
 
 export default function RootLayout({
   children,
