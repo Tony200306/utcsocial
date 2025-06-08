@@ -17,7 +17,7 @@ export const signinUser = async ({
 
     // Thử set cookie
     try {
-      document.cookie = `jwt=${token}; path=/; max-age=${15 * 24 * 60 * 60}; SameSite=none; Secure=true`;
+      document.cookie = `jwt=${token}; path=/; max-age=${15 * 24 * 60 * 60}; SameSite=none; Secure=true;Domain=572e-118-71-136-130.ngrok-free.app`;
       console.log('[SignIn] Cookie set manually:', document.cookie);
     } catch (e) {
       console.error('[SignIn] Failed to set cookie:', e);
