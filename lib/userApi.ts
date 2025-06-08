@@ -8,7 +8,7 @@ const getContentType = (data: any) => {
 };
 
 const axiosClient = axios.create({
-  baseURL: "https://ff0d-118-71-136-130.ngrok-free.app",
+  baseURL: "https://572e-118-71-136-130.ngrok-free.app",
   // baseURL: "http://localhost:5000/api",
 
   withCredentials: true,
