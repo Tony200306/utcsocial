@@ -3,15 +3,44 @@ import { Slack as Logo } from "lucide-react";
 import { UserAuthForm } from "../_components/sign-in-form";
 import Link from "next/link";
 import useUserStore from "@/store/useUserStore";
+import { useUserStoreHydration } from "@/hooks/useUserStoreHydration";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function SignIn() {
   const user = useUserStore((state) => state.user);
-  if (user) {
-    if (typeof window !== "undefined") {
-      window.location.href = "/";
+  const hydrateUser = useUserStore((state) => state.hydrateUser);
+  const isHydrated = useUserStoreHydration();
+  const router = useRouter();
+
+  // Hydrate user from cookies when component mounts
+  useEffect(() => {
+    if (isHydrated && !user) {
+      hydrateUser();
     }
+  }, [isHydrated, user, hydrateUser]);
+
+  // Redirect if user is logged in
+  useEffect(() => {
+    if (isHydrated && user) {
+      router.push("/");
+    }
+  }, [isHydrated, user, router]);
+
+  // Show loading during hydration
+  if (!isHydrated) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
+
+  // Don't render if user is logged in
+  if (user) {
     return null;
   }
+
   return (
     <div className="container relative grid h-svh flex-col items-center justify-center lg:max-w-none lg:grid-cols-2 lg:px-0">
       <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
