@@ -3,6 +3,13 @@ import { User } from "@/types/userType";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
+// Debug helper
+const debugLog = (message: string, data?: any) => {
+  if (typeof window !== 'undefined') {
+    console.log(`[UserStore Debug] ${message}`, data);
+  }
+};
+
 interface UserStore {
   user: User | null;
   isHydrated: boolean;
@@ -39,22 +46,34 @@ const useUserStore = create<UserStore>()(
       _hasHydrated: false,
 
       setHasHydrated: (state) => {
-        set({
-          _hasHydrated: state,
-        });
+        debugLog('setHasHydrated called', { state });
+        set({ _hasHydrated: state });
       },
 
       hydrateUser: async () => {
+        debugLog('hydrateUser: Starting hydration...');
         try {
           const user = await getUserByCookies();
-          set({ user, isHydrated: true });
+          debugLog('hydrateUser: API response', user);
+
+          if (user) {
+            debugLog('hydrateUser: Setting user', user);
+            set({ user, isHydrated: true });
+          } else {
+            debugLog('hydrateUser: No user found, clearing state');
+            set({ user: null, isHydrated: true });
+          }
         } catch (error) {
+          debugLog('hydrateUser: Error occurred', error);
           console.error("Failed to hydrate user:", error);
           set({ user: null, isHydrated: true });
         }
       },
 
-      setUser: (user) => set({ user }),
+      setUser: (user) => {
+        debugLog('setUser called', user);
+        set({ user });
+      },
 
       updateUser: (updatedFields) =>
         set((state) => ({
@@ -163,28 +182,53 @@ const useUserStore = create<UserStore>()(
           user: state.user ? { ...state.user, onboarded: status } : null,
         })),
 
-      logout: () => set({ user: null }),
+      logout: () => {
+        debugLog('logout called');
+        set({ user: null });
+      },
     }),
     {
       name: "user-storage",
       storage: createJSONStorage(() => {
+        debugLog('Storage: Initializing storage');
         if (typeof window !== "undefined") {
-          return localStorage;
+          debugLog('Storage: Using localStorage');
+          return {
+            getItem: (name) => {
+              const item = localStorage.getItem(name);
+              debugLog('Storage: getItem', { name, item });
+              return item;
+            },
+            setItem: (name, value) => {
+              debugLog('Storage: setItem', { name, value });
+              localStorage.setItem(name, value);
+            },
+            removeItem: (name) => {
+              debugLog('Storage: removeItem', { name });
+              localStorage.removeItem(name);
+            },
+          };
         }
+        debugLog('Storage: Using fallback storage (server-side)');
         return {
           getItem: () => null,
           setItem: () => { },
           removeItem: () => { },
         };
       }),
-      partialize: (state) => ({
-        user: state.user,
-      }),
+      partialize: (state) => {
+        const partialState = { user: state.user };
+        debugLog('Storage: partialize', partialState);
+        return partialState;
+      },
       onRehydrateStorage: (state) => {
+        debugLog('Storage: onRehydrateStorage called');
         return (state, error) => {
           if (error) {
-            console.log("An error happened during hydration", error);
+            debugLog('Storage: Hydration error', error);
+            console.log('An error happened during hydration', error);
           } else {
+            debugLog('Storage: Hydration successful', state);
             state?.setHasHydrated(true);
           }
         };
