@@ -12,12 +12,16 @@ const axiosClient = axios.create({
   // baseURL: "http://localhost:5000/api",
 
   withCredentials: true,
-  
+  headers: {
+    'ngrok-skip-browser-warning': 'true', // Bỏ qua ngrok warning page
+  }
+
 });
 
 axiosClient.interceptors.request.use(
   (config) => {
     config.headers["Content-Type"] = getContentType(config.data);
+    config.withCredentials = true;
 
     return config;
   },

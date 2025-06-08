@@ -12,6 +12,7 @@ export const signinUser = async ({
     email,
     password,
   });
+
   if (response.data.error) {
     throw new Error(response.data.error);
   }
