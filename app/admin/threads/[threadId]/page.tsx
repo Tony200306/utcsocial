@@ -1,79 +1,235 @@
 "use client";
 
 import { useQuery } from "react-query";
-import { getThreadById } from "@/apis/admin"; // API để lấy thông tin thread
-import { Thread } from "@/types/threadType"; // Import kiểu dữ liệu Thread
+import { getThreadById } from "@/apis/admin";
+import { Thread } from "@/types/threadType";
+import {
+  Calendar,
+  MessageCircle,
+  Heart,
+  Repeat,
+  Share,
+  Eye,
+  EyeOff,
+  Edit,
+  Trash2,
+} from "lucide-react";
+import { ThreadStatusModal } from "./components/ThreadStatusModal";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Toaster } from "@/components/ui/sonner";
 
-export default function ThreadDetailsPage({ params }: Readonly<{ params: { threadId: string } }>) {
-  const threadId = params.threadId; // Lấy threadId từ URL
+export default function ThreadDetailsPage({
+  params,
+}: Readonly<{ params: { threadId: string } }>) {
+  const threadId = params.threadId;
 
-  const { data: thread, isLoading, error } = useQuery<Thread>({
+  // States cho modals
+  const [isHideModalOpen, setIsHideModalOpen] = useState(false);
+  const [isShowModalOpen, setIsShowModalOpen] = useState(false);
+
+  const {
+    data: thread,
+    isLoading,
+    error,
+    refetch, // Để refresh data sau khi update
+  } = useQuery<Thread>({
     queryKey: ["thread", threadId],
     queryFn: () => getThreadById({ id: threadId }),
     enabled: !!threadId,
   });
 
-  if (isLoading) return <p>Loading thread details...</p>;
-  if (error) return <p>Error fetching thread details.</p>;
-  return (
-    <section className="p-10">
-      <h1 className="mb-4 text-xl font-bold">Thread Details</h1>
+  const handleSuccess = () => {
+    // Refresh thread data sau khi cập nhật thành công
+    refetch();
+  };
 
-      {/* Basic Thread Information */}
-      <div className="mb-6">
-        <p><strong>Thread ID:</strong> {thread?._id}</p>
-        <p><strong>Text:</strong> {thread?.text}</p>
-        <p><strong>Posted By:</strong> @{thread?.postedBy.username}</p>
-        <p><strong>Created At:</strong> {new Date(thread?.createdAt).toLocaleDateString()}</p>
-        <p><strong>Comment Count:</strong> {thread?.commentCount}</p>
-        <p><strong>Like Count:</strong> {thread?.likeCount}</p>
-        <p><strong>Repost Count:</strong> {thread?.repostCount}</p>
-        <p><strong>Share Count:</strong> {thread?.shareCount}</p>
-        <p><strong>Hidden:</strong> {thread?.isHidden ? "Yes" : "No"}</p>
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-96">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
+    );
+  }
 
-      {/* Images */}
-      {thread?.imgs && thread.imgs.length > 0 && (
-        <div className="mb-6">
-          <p><strong>Images:</strong></p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-            {thread.imgs.map((img, index) => (
-              <img
-                key={index}
-                src={img}
-                alt={`Thread Image ${index + 1}`}
-                className="w-full h-auto object-cover rounded"
-              />
-            ))}
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-96">
+        <div className="text-center p-8 bg-red-50 rounded-lg border border-red-200">
+          <p className="text-red-600 font-medium">
+            Error fetching thread details
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const isThreadHidden = thread?.isHidden;
+
+  return (
+    <div className="max-w-4xl mx-auto p-6 space-y-6">
+      {/* Header */}
+      <div className="bg-white rounded-lg shadow-sm border p-6">
+        <div className="flex items-start justify-between mb-4">
+          <h1 className="text-2xl font-bold text-gray-900">Thread Details</h1>
+          <div className="flex items-center space-x-2">
+            {thread?.isHidden ? (
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                <EyeOff className="w-3 h-3 mr-1" />
+                Hidden
+              </span>
+            ) : (
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                <Eye className="w-3 h-3 mr-1" />
+                Visible
+              </span>
+            )}
           </div>
         </div>
-      )}
 
-      {/* Actions */}
-      <div className="mt-6">
-        <button className="px-4 py-2 bg-blue-500 text-white rounded mr-2">
-          Edit Thread
-        </button>
-        <button className="px-4 py-2 bg-red-500 text-white rounded">
-          Delete Thread
-        </button>
+        {/* Thread Info */}
+        <div className="space-y-3">
+          <div className="flex items-center text-sm text-gray-600">
+            <span className="font-medium">ID:</span>
+            <span className="ml-2 font-mono bg-gray-100 px-2 py-1 rounded text-xs">
+              {thread?._id}
+            </span>
+          </div>
+
+          <div className="flex items-center space-x-4 text-sm text-gray-600">
+            <div className="flex items-center">
+              <Calendar className="w-4 h-4 mr-1" />
+              {new Date(thread?.createdAt || "").toLocaleDateString()}
+            </div>
+            <div>
+              <strong>@{thread?.postedBy.username}</strong>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Children Threads */}
-      {thread?.children && thread.children.length > 0 && (
-        <div className="mt-8">
-          <h2 className="text-lg font-semibold">Replies:</h2>
-          <ul className="mt-4 space-y-4">
-            {thread.children.map((child) => (
-              <li key={child._id} className="p-4 border rounded shadow">
-                <p><strong>Posted By:</strong> @{child.postedBy.username}</p>
-                <p><strong>Text:</strong> {child.text}</p>
-                <p><strong>Created At:</strong> {new Date(child.createdAt).toLocaleDateString()}</p>
-              </li>
-            ))}
-          </ul>
+      {/* Thread Content */}
+      <div className="bg-white rounded-lg shadow-lg border-2 border-blue-200 p-6 ring-2 ring-blue-100">
+        <div className="mb-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-4 border-b-2 border-blue-200 pb-2">
+            Thread Content
+          </h2>
+          <p className="text-gray-900 text-lg leading-relaxed font-medium bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+            {thread?.text}
+          </p>
         </div>
-      )}
-    </section>
+
+        {/* Images */}
+        {thread?.imgs && thread.imgs.length > 0 && (
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">Images</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {thread.imgs.map((img, index) => (
+                <div
+                  key={index}
+                  className="relative overflow-hidden rounded-lg border"
+                >
+                  <img
+                    src={img}
+                    alt={`Thread Image ${index + 1}`}
+                    className="w-full h-48 object-cover hover:scale-105 transition-transform duration-200"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Stats */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+          <div className="bg-blue-50 rounded-lg p-4 text-center">
+            <MessageCircle className="w-6 h-6 text-blue-600 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-blue-600">
+              {thread?.commentCount || 0}
+            </div>
+            <div className="text-sm text-blue-600">Comments</div>
+          </div>
+          <div className="bg-red-50 rounded-lg p-4 text-center">
+            <Heart className="w-6 h-6 text-red-600 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-red-600">
+              {thread?.likeCount || 0}
+            </div>
+            <div className="text-sm text-red-600">Likes</div>
+          </div>
+
+          <div className="bg-purple-50 rounded-lg p-4 text-center">
+            <Share className="w-6 h-6 text-purple-600 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-purple-600">
+              {thread?.shareCount || 0}
+            </div>
+            <div className="text-sm text-purple-600">Shares</div>
+          </div>
+        </div>
+
+        {/* Actions với Modal */}
+        <div className="space-y-4">
+          <div className="flex space-x-3"></div>
+
+          {/* Thread Status Controls */}
+          <div className="border-t pt-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">
+              Thread Visibility Controls
+            </h3>
+
+            <div className="flex gap-4">
+              {/* Nút Hiện Thread */}
+              <Button
+                onClick={() => setIsShowModalOpen(true)}
+                disabled={!isThreadHidden}
+                className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 flex items-center"
+              >
+                <Eye className="h-4 w-4 mr-2" />
+                Hiện thread
+              </Button>
+
+              {/* Nút Ẩn Thread */}
+              <Button
+                onClick={() => setIsHideModalOpen(true)}
+                disabled={isThreadHidden}
+                className="bg-red-600 hover:bg-red-700 disabled:bg-gray-400 flex items-center"
+              >
+                <EyeOff className="h-4 w-4 mr-2" />
+                Ẩn thread
+              </Button>
+            </div>
+
+            {/* Status info */}
+            <div className="text-sm text-gray-600 mt-2">
+              {isThreadHidden ? (
+                <p>⚠️ Thread này hiện đang bị ẩn khỏi công chúng</p>
+              ) : (
+                <p>✅ Thread này đang hiển thị công khai</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Modal Hiện Thread */}
+      <ThreadStatusModal
+        thread={thread || null}
+        isOpen={isShowModalOpen}
+        onClose={() => setIsShowModalOpen(false)}
+        onSuccess={handleSuccess}
+        action="show"
+      />
+
+      {/* Modal Ẩn Thread */}
+      <ThreadStatusModal
+        thread={thread || null}
+        isOpen={isHideModalOpen}
+        onClose={() => setIsHideModalOpen(false)}
+        onSuccess={handleSuccess}
+        action="hide"
+      />
+
+      {/* Toast notifications */}
+      <Toaster />
+    </div>
   );
 }

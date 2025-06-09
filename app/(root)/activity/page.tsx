@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
- import { Notification } from "@/types/notification";
+import { Notification } from "@/types/notification";
 import { BellRing, Check } from "lucide-react";
 import { useState } from "react";
 import { useQuery } from "react-query";
@@ -60,24 +60,9 @@ function Page({ params, searchParams }: PageProps) {
   return (
     <Card className="mx-auto max-w-2xl">
       <CardHeader>
-        <CardTitle>Notifications</CardTitle>
-        <CardDescription>
-          You have {notifications.length} unread messages.
-        </CardDescription>
+        <CardTitle>Thông báo</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-4">
-        <div className="flex space-x-4 rounded-md p-4 w-50">
-          <BellRing />
-          <div className="space-y-1">
-            <p className="text-sm font-medium leading-none">
-              Push Notifications
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Send notifications to device.
-            </p>
-          </div>
-          <Switch />
-        </div>
         <div>
           {notifications.map((notification, index) => (
             <div

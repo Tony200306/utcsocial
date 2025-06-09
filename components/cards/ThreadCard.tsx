@@ -1,16 +1,15 @@
-import { likeOrUnlikeThread } from "@/apis/threads";
 import { createConversation } from "@/apis/conversation";
+import { likeOrUnlikeThread } from "@/apis/threads";
 import { FollowContext } from "@/Context/Context";
 import { copyLink, formatDateString } from "@/lib/utils";
-import useTempStore from "@/store/useTempStore";
 import useTriggerStore from "@/store/useTriggerStore";
 import useUserStore from "@/store/useUserStore";
 import { Thread } from "@/types/threadType";
 import {
+  ChatBubbleIcon,
   HeartFilledIcon,
   HeartIcon,
   Share1Icon,
-  ChatBubbleIcon,
 } from "@radix-ui/react-icons";
 import {
   BellMinusIcon,
@@ -24,6 +23,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useContext, useMemo, useState } from "react";
 import { useMutation } from "react-query";
 import Carousel from "../custom/carousel";
@@ -39,7 +39,6 @@ import {
   MenubarTrigger,
 } from "../ui/menubar";
 import { CreateReportCard } from "./CreateReportCard";
-import { useRouter } from "next/navigation";
 type Props = {
   data: Thread;
   displayType?: 1 | 2;
@@ -206,30 +205,20 @@ export function ThreadCard({
                   </MenubarTrigger>
                   <MenubarContent align="end">
                     <MenubarItem className="flex cursor-default items-center justify-between py-2">
-                      Save<MenubarShortcut>⌘CTRL + S</MenubarShortcut>
+                      Chia sẻ<MenubarShortcut></MenubarShortcut>
                     </MenubarItem>
-                    <MenubarItem className="flex cursor-default items-center justify-between py-2">
-                      Not interested
-                      <BellOffIcon className="size-4 cursor-pointer " />
-                    </MenubarItem>
-                    <MenubarSeparator />
-                    <MenubarItem className="flex cursor-default items-center justify-between py-2">
-                      Mute
-                      <BellMinusIcon className="size-4 cursor-pointer " />
-                    </MenubarItem>
-                    <MenubarItem className="flex cursor-default items-center justify-between py-2">
-                      Block
-                      <ListXIcon className="size-4 cursor-pointer" />
-                    </MenubarItem>
-                    <MenubarItem
+
+                    {user?._id !== data.postedBy._id?.toString() && (
+                      <MenubarItem
                       onClick={() => {
                         setIsCreateReportCardOpen(!isCreateReportCardOpen);
                       }}
                       className="flex cursor-default items-center justify-between py-2"
-                    >
-                      Report
+                      >
+                      Báo cáo
                       <FlagTriangleRightIcon className="size-4 cursor-pointer" />
-                    </MenubarItem>
+                      </MenubarItem>
+                    )}
                     <MenubarSeparator />
                     <MenubarItem
                       onClick={() => copyLink(threadUrl)}
@@ -310,7 +299,7 @@ export function ThreadCard({
                         onClick={() => copyLink(quoteThread)}
                         className="cursor-default py-2"
                       >
-                        Get embed code
+                       Chia sẻ
                       </MenubarItem>
                     </MenubarContent>
                   </MenubarMenu>

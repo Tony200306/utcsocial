@@ -33,9 +33,9 @@ export function UsersChart() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>New Users</CardTitle>
+        <CardTitle>BIỂU ĐỒ NGƯỜI DÙNG MỚI</CardTitle>
         <CardDescription>
-          Showing total visitors for the last 6 months
+         SỐ NGƯỜI DÙNG MỚI 6 THÁNG GẦN NHẤT
         </CardDescription>
       </CardHeader>
       <CardContent>

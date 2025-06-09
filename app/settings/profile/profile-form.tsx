@@ -25,16 +25,16 @@ import { Toaster } from "@/components/ui/sonner";
 const profileFormSchema = z.object({
   username: z
     .string()
-    .min(2, { message: "Username must be at least 2 characters." })
-    .max(30, { message: "Username must not be longer than 30 characters." }),
+    .min(2, { message: "Tên đăng nhập phải có ít nhất 2 ký tự." })
+    .max(30, { message: "Tên đăng nhập không được dài quá 30 ký tự." }),
   name: z
-    .string({ required_error: "Please enter your name." })
-    .min(2, { message: "Name must be at least 2 characters." })
-    .max(10, { message: "Name must not be longer than 10 characters." }),
+    .string({ required_error: "Vui lòng nhập tên của bạn." })
+    .min(2, { message: "Tên phải có ít nhất 2 ký tự." })
+    .max(10, { message: "Tên không được dài quá 10 ký tự." }),
   bio: z
     .string()
-    .min(4, { message: "Bio must be at least 4 characters." })
-    .max(160, { message: "Bio must not be longer than 160 characters." }),
+    .min(4, { message: "Tiểu sử phải có ít nhất 4 ký tự." })
+    .max(160, { message: "Tiểu sử không được dài quá 160 ký tự." }),
 });
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
@@ -58,27 +58,27 @@ export default function ProfileForm() {
   });
   const { mutate: mutateUpdateUser } = useMutation(updateUser, {
     onSuccess: () => {
-         toast("Thông báo hoạt động", {
-          description: `Đã cập nhật thông tin thành công`,
-          action: {
-            label: "Ẩn",
-            onClick: () => console.log(""),
-          },
-        });
+      toast("Thông báo hoạt động", {
+        description: `Đã cập nhật thông tin thành công`,
+        action: {
+          label: "Ẩn",
+          onClick: () => console.log(""),
+        },
+      });
     },
     onError: (error: any) => {
-      console.error("Error creating thread:", error);
+      console.error("Lỗi cập nhật thông tin:", error);
     },
   });
 
   const onSubmit = (data: ProfileFormValues) => {
     if (!file) {
-      setImageError("Please upload a profile photo.");
+      setImageError("Vui lòng tải lên ảnh đại diện.");
       return;
     }
 
     if (!["image/png", "image/jpeg"].includes(file.type)) {
-      setImageError("Please upload a valid image (PNG or JPEG).");
+      setImageError("Vui lòng tải lên ảnh hợp lệ (PNG hoặc JPEG).");
       return;
     }
     mutateUpdateUser({
@@ -104,7 +104,7 @@ export default function ProfileForm() {
       setImageError(null);
       setImagePreview(URL.createObjectURL(selectedFile));
     } else {
-      setImageError("Please select a valid image file.");
+      setImageError("Vui lòng chọn tệp ảnh hợp lệ.");
     }
   };
 
@@ -129,16 +129,16 @@ export default function ProfileForm() {
             {imagePreview ? (
               <Image
                 src={imagePreview}
-                alt="profile_icon"
+                alt="ảnh đại diện"
                 width={96}
                 height={96}
                 className="rounded-full"
               />
             ) : (
               <Image
-              unoptimized
+                unoptimized
                 src={user?.profilePic ?? "/images/profile.png"}
-                alt="profile_icon"
+                alt="ảnh đại diện"
                 width={100}
                 height={100}
                 className="rounded-full object-contain"
@@ -162,9 +162,9 @@ export default function ProfileForm() {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>Tên</FormLabel>
               <FormControl>
-                <Input placeholder="Enter your name" {...field} />
+                <Input placeholder="Nhập tên của bạn" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -177,27 +177,25 @@ export default function ProfileForm() {
           name="bio"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Bio</FormLabel>
+              <FormLabel>Tiểu sử</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Tell us a bit about yourself"
+                  placeholder="Giới thiệu một chút về bản thân"
                   className="resize-none"
                   {...field}
                 />
               </FormControl>
               <FormDescription>
-                You can <span>@mention</span> other users to link them.
+                Bạn có thể <span>@mention</span> người dùng khác để liên kết với họ.
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <Button type="submit">Update profile</Button>
+        <Button type="submit">Cập nhật hồ sơ</Button>
       </form>
-              <Toaster/>
-      
+      <Toaster />
     </Form>
-    
   );
 }

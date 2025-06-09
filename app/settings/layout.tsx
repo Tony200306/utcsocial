@@ -17,6 +17,7 @@ import {
   IconUser,
 } from "@tabler/icons-react";
 import useUserStore from "@/store/useUserStore";
+import Topbar from "@/components/shared/Topbar";
 
 export default function RootLayout({
   children,
@@ -24,7 +25,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const user = useUserStore((state) => state.user);
-  console.log("user", user);
   return (
     <>
       <main className="flex flex-row">
@@ -34,25 +34,15 @@ export default function RootLayout({
             <Layout fixed>
               {/* ===== Top Heading ===== */}
               <Layout.Header>
-                <Input
-                  type="search"
-                  placeholder="Search..."
-                  className="md:w-[100px] lg:w-[300px]"
-                />
-                <div className="ml-auto flex items-center space-x-4">
-                  <ThemeSwitch />
-                  <UserNav />
-                </div>
+                <div className="ml-auto flex items-center space-x-4"></div>
               </Layout.Header>
 
               <Layout.Body className="flex flex-col">
                 <div className="space-y-0.5">
                   <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
-                    Settings
+                    Cài đặt
                   </h1>
-                  <p className="text-muted-foreground">
-                    Manage your account settings and set e-mail preferences.
-                  </p>
+                  <p className="text-muted-foreground"></p>
                 </div>
                 <Separator className="my-4 lg:my-6" />
                 <div className="flex flex-1 flex-col space-y-8 md:space-y-2 md:overflow-hidden lg:flex-row lg:space-x-12 lg:space-y-0">
@@ -75,33 +65,13 @@ export default function RootLayout({
 
 const sidebarNavItems = [
   {
-    title: "Profile",
+    title: "Thông tin cá nhân",
     icon: <IconUser size={18} />,
     href: "/settings/profile",
   },
   {
-    title: "Account",
+    title: "Thay đổi mật khẩu",
     icon: <IconTool size={18} />,
     href: "/settings/account",
-  },
-  {
-    title: "Appearance",
-    icon: <IconPalette size={18} />,
-    href: "/settings/appearance",
-  },
-  {
-    title: "Notifications",
-    icon: <IconNotification size={18} />,
-    href: "/settings/notifications",
-  },
-  {
-    title: "Display",
-    icon: <IconBrowserCheck size={18} />,
-    href: "/settings/display",
-  },
-  {
-    title: "Error Example",
-    icon: <IconExclamationCircle size={18} />,
-    href: "/settings/error-example",
   },
 ];

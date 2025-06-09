@@ -1,6 +1,5 @@
-"use client"
-import { TrendingUp } from "lucide-react"
-import { Bar, BarChart, XAxis, YAxis } from "recharts"
+"use client";
+import { getMonthlyTopTagChartData } from "@/apis/dashboard";
 import {
   Card,
   CardContent,
@@ -8,33 +7,48 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
-const chartData = [
-  { month: "January", desktop: 186 },
-  { month: "February", desktop: 305 },
-  { month: "March", desktop: 237 },
-  { month: "April", desktop: 73 },
-  { month: "May", desktop: 209 },
-  { month: "June", desktop: 214 },
-]
+} from "@/components/ui/chart";
+import { useEffect, useState } from "react";
+import { Bar, BarChart, XAxis, YAxis } from "recharts";
+
 const chartConfig = {
   desktop: {
-    label: "Desktop",
+    label: "Top Tag",
     color: "hsl(var(--chart-1))",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 export function NewThreadsChart() {
+  const [chartData, setChartData] = useState<
+    { month: string; desktop: number }[]
+  >([]);
+  // console.log("NewThreadsChart rendered with chartData:", chartData); // It's good practice to remove console.logs in production
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const rawData = await getMonthlyTopTagChartData();
+        const formattedData = rawData.map((item) => ({
+          month: item.month + "( " + item.topTag + " )", // This 'month' field should contain the tag name
+          desktop: item.tagFrequency,
+        }));
+        setChartData(formattedData);
+      } catch (error) {
+        console.error("Failed to fetch chart data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Bar Chart - Horizontal</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardTitle>BIỂU ĐỒ TOP CHỦ ĐỀ</CardTitle>
+        <CardDescription>7/2024 - 6/2025</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
@@ -46,31 +60,26 @@ export function NewThreadsChart() {
               left: -20,
             }}
           >
-            <XAxis type="number" dataKey="desktop" hide />
+            <XAxis type="number" dataKey="desktop" />
             <YAxis
-              dataKey="month"
+              width={200}
+              dataKey="month" // This dataKey provides the label for the tooltip
               type="category"
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              tickFormatter={(value) => value.slice(0, 3)}
+              interval={0}
+              tickFormatter={(value) => value.slice(0, 20)}
             />
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent hideLabel />}
+              content={<ChartTooltipContent />} // Removed hideLabel prop
             />
             <Bar dataKey="desktop" fill="var(--color-desktop)" radius={5} />
           </BarChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 font-medium leading-none">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-        </div>
-        <div className="leading-none text-muted-foreground">
-          Showing total visitors for the last 6 months
-        </div>
-      </CardFooter>
+      <CardFooter className="flex-col items-start gap-2 text-sm"></CardFooter>
     </Card>
-  )
+  );
 }

@@ -12,8 +12,8 @@ import { useEffect, useRef, useState } from "react";
 import { useQuery } from "react-query";
 
 const profileTabs = [
-  { value: "threads", label: "Threads", icon: "/assets/reply.svg" },
-  { value: "replies", label: "Replies", icon: "/assets/members.svg" },
+  { value: "threads", label: "Bài viết", icon: "/assets/reply.svg" },
+  { value: "replies", label: "Trả lời", icon: "/assets/members.svg" },
   // { value: "repost", label: "Repost", icon: "/assets/tag.svg" },
 ];
 
@@ -82,7 +82,7 @@ export default function Page({ params }: Readonly<{ params: { id: string } }>) {
     replies: [],
   });
 
-  if (!userData) return <>ko tìm thấy user</>;
+  if (!userData) return <>Không tìm thấy người dùng</>;
   return (
     <section>
       <ProfileHeader data={userData} />

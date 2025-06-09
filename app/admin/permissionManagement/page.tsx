@@ -39,17 +39,17 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import {
+  Dialog,
+  DialogTrigger,
   Dialog as RadixDialog,
-  DialogTrigger as RadixDialogTrigger
+  DialogTrigger as RadixDialogTrigger,
 } from "@radix-ui/react-dialog";
 
-import {
-  DialogContent
-} from "@/components/ui/dialog";
+import { DialogContent } from "@/components/ui/dialog";
 import { Toaster } from "@/components/ui/sonner";
 import { User } from "@/types/userType";
 import { ChangeRoleForm } from "./components/ChangeRoleForm";
-
+import { AddAdminForm } from "./components/AddAdminForm";
 
 export const columns: ColumnDef<User>[] = [
   {
@@ -111,7 +111,6 @@ export const columns: ColumnDef<User>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const user = row.original;
-      console.log("user", user);
       return (
         <RadixDialog>
           <DropdownMenu>
@@ -164,6 +163,7 @@ export default function DataTableDemo() {
     pageIndex: 0,
     pageSize: 10,
   });
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
   const userLogin = useUserStore((state) => state.user);
   const [isChecking, setIsChecking] = useState(true);
@@ -214,6 +214,12 @@ export default function DataTableDemo() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleAddSuccess = () => {
+    // Refresh data sau khi thêm thành công
+    fetchUsers();
+    setIsAddDialogOpen(false);
   };
 
   useEffect(() => {
@@ -277,6 +283,20 @@ export default function DataTableDemo() {
           }
           className="max-w-sm"
         />
+        <div className="ml-2">
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline">Thêm người quản trị</Button>
+            </DialogTrigger>
+            <DialogContent className="bg-dark-1 border-gray-600 sm:max-w-[500px]">
+              <AddAdminForm
+                onSuccess={handleAddSuccess}
+                onClose={() => setIsAddDialogOpen(false)}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
@@ -304,6 +324,7 @@ export default function DataTableDemo() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -381,9 +402,7 @@ export default function DataTableDemo() {
             size="sm"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
+          />
           <Button
             variant="outline"
             size="sm"
@@ -394,6 +413,7 @@ export default function DataTableDemo() {
           </Button>
         </div>
       </div>
+      <Toaster />
     </div>
   );
 }

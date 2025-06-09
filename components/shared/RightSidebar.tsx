@@ -44,11 +44,11 @@ export default function   RightSidebar() {
 
           <div className="flex flex-1 flex-col justify-start">
             <h3 className="text-heading4-medium dark:text-light-1">
-              Similar Minds
+              Người dùng nổi bật
               <ul className="list-none p-0 m-0 w-[350px] flex flex-col gap-5">
 
 {topUsersST?.length === 0 ? (
-  <td colSpan={6} className="text-center py-4">No users found</td>
+  <td colSpan={6} className="text-center py-4">Danh sách rỗng</td>
 
 ) : (
 
@@ -74,7 +74,7 @@ export default function   RightSidebar() {
             <ul className="list-none p-0 m-0 w-[350px] flex flex-col gap-5">
 
 {userIamfollowST?.length === 0 ? (
-  <td colSpan={6} className="text-center py-4">No users found</td>
+  <td colSpan={6} className="text-center py-4">Danh sách rỗng</td>
 
 ) : (
 

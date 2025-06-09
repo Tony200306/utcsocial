@@ -29,21 +29,38 @@ const ErrorPage = () => {
         {typeError}
       </h1>
       {!user && (
-        <button
-          onClick={handleGoToLogin}
-          style={{
-            padding: "10px 20px",
-            fontSize: "1rem",
-            backgroundColor: "#1976d2",
-            color: "white",
-            border: "none",
-            borderRadius: "5px",
-            cursor: "pointer",
-          }}
-        >
-          Đến trang đăng nhập
-        </button>
-      )}
+        <div>
+          {" "}
+          <button
+            onClick={handleGoToLogin}
+            style={{
+              padding: "10px 20px",
+              fontSize: "1rem",
+              backgroundColor: "#1976d2",
+              color: "white",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+            }}
+          >
+            Đến trang đăng nhập
+          </button>
+        </div>
+      )}{" "}
+      <button
+        onClick={() => router.push("/")}
+        style={{
+          padding: "10px 20px",
+          fontSize: "1rem",
+          backgroundColor: "#1976d2",
+          color: "white",
+          border: "none",
+          borderRadius: "5px",
+          cursor: "pointer",
+        }}
+      >
+        Về trang chủ
+      </button>
     </div>
   );
 };

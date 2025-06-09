@@ -4,8 +4,8 @@ import ProfileForm from "./profile-form";
 export default function Page() {
   return (
     <ContentSection
-      title="Profile"
-      desc="This is how others will see you on the site."
+      title="Thay đổi mật khẩu"
+      desc=""
     >
       <ProfileForm />
     </ContentSection>

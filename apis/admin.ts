@@ -134,6 +134,7 @@ export const getReportById = async ({ id }: { id: string }): Promise<Report> => 
 };
 export const getReportsBySearch = async ({ page, searchText }: { page: number; searchText: string }): Promise<Report[]> => {
     try {
+        console.log("Fetching reports with searchText:", searchText, "on page:", page);
         const response = await axiosClient.get(`/report/search/`, {
             params: { page, searchText },
         });
@@ -171,3 +172,68 @@ export const updateUserRoleStatus = async ({
     }
 };
 
+export const updateUserRole: ({
+    id,
+    role,
+}: {
+    id: string;
+    role: string;
+}) => Promise<{ success: boolean; message: string }> = async ({
+    id,
+    role,
+}: {
+    id: string;
+    role: string;
+}) => {
+        try {
+            const response = await axiosClient.post(`/users/update-role/${id}`, { role });
+
+            if (response.data.error) {
+                throw new Error(response.data.error);
+            }
+
+            return response.data as { success: boolean; message: string };
+        } catch (error) {
+            console.error("Error updating user role:", error);
+            throw new Error("Failed to update user role");
+        }
+    };
+
+export const updateUserStatus = async ({
+    id,
+    status,
+}: {
+    id: string;
+    status: string;
+}): Promise<{ success: boolean; message: string }> => {
+    try {
+        const response = await axiosClient.put(`/users/update-status/${id}`, { accountStatus: status });
+
+        if (response.data.error) {
+            throw new Error(response.data.error);
+        }
+
+        return response.data as { success: boolean; message: string };
+    } catch (error) {
+        console.error("Error updating user status:", error);
+        throw new Error("Failed to update user status");
+    }
+};
+
+export const toggleThreadVisibility = async ({
+    id,
+}: {
+    id: string;
+}): Promise<{ success: boolean; message: string }> => {
+    try {
+        const response = await axiosClient.put(`admins/threads/block/${id}`);
+        if (response.data.error) {
+            throw new Error(response.data.error);
+        }
+
+        return response.data as { success: boolean; message: string };
+    } catch (error) {
+        console.error("Error toggling thread visibility:", error);
+        throw new Error("Failed to toggle thread visibility");
+    }
+};

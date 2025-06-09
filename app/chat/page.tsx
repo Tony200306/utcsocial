@@ -35,6 +35,7 @@ import "./style.css";
 import { useRouter, useSearchParams } from "next/navigation";
 let socket: any;
 export default function ChatPage() {
+  const [text, setText] = useState<string>("");
   const user = useUserStore((state) => state.user);
   const router = useRouter();
   const [currentUserChat, setCurrentUserChat] = useState("");
@@ -121,6 +122,8 @@ export default function ChatPage() {
   const { mutate: sendMessagesFunc } = useMutation({
     mutationFn: sendMessages,
     onSuccess: () => {
+      setText("");
+      setUploadedFiles([]);
       console.log("Send Messages success:");
     },
     onError: (error: any) => {
@@ -145,7 +148,6 @@ export default function ChatPage() {
 
     socket.on("newMessage", (newMessage: MessageType) => {
       console.log("New message received:", newMessage);
-
       if (newMessage.conversationId === currentConversation._id) {
         setAllMessages((prevMessages) => [...prevMessages, newMessage]);
       }
@@ -175,6 +177,39 @@ export default function ChatPage() {
   const handleRemoveFile = useCallback((index: number) => {
     setUploadedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   }, []);
+  // Khi người dùng nhập tin nhắn (ví dụ trong MessageInput)
+  const handleTyping = (
+    innerHtml: string,
+    textContent: string,
+    innerText: string,
+    nodes: NodeList
+  ) => {
+    setText(textContent);
+    const isTyping = textContent.length > 0;
+    socket.emit("typing", {
+      recipientId: currentUserChat, // ID của người nhận
+      senderId: user?._id, // ID của người gửi
+      isTyping,
+    });
+  };
+  const [isTyping, setIsTyping] = useState(false);
+  useEffect(() => {
+    socket.on(
+      "typing",
+      ({ senderId, isTyping }: { senderId: string; isTyping: boolean }) => {
+        console.log("Typing event received:", senderId, isTyping);
+        // Nếu senderId trùng với ID của người đang chat cùng
+        if (senderId === currentUserChat) {
+          setIsTyping(isTyping); // set state hiển thị TypingIndicator
+        }
+      }
+    );
+
+    return () => {
+      socket.off("typing");
+    };
+  }, [socket, currentUserChat]);
+
   return (
     <div className=" inset-0">
       <MainContainer className="!h-[732x] md:!h-[832px]">
@@ -198,6 +233,12 @@ export default function ChatPage() {
               return (
                 <Conversation
                   onClick={() => {
+                    if (currentConversation?._id !== conversation._id) {
+                      setText("");
+                      if (currentConversation?._id) {
+                        handleTyping("", "", "", document.createDocumentFragment().childNodes);
+                      }
+                    }
                     setCurrentUserChat(conversation.participants[0]._id);
                     setCurrentConversation(conversation);
                     updateURLWithConversation(conversation._id);
@@ -258,7 +299,11 @@ export default function ChatPage() {
               </ConversationHeader.Actions>
             </ConversationHeader>
             <MessageList
-              typingIndicator={<TypingIndicator content="Emily is typing" />}
+              typingIndicator={
+                isTyping && (
+                  <TypingIndicator content="Người dùng đang nhập tin nhắn" />
+                )
+              }
             >
               {allMessages?.map((msg, index, arr) => {
                 console.log("msg", msg);
@@ -411,6 +456,7 @@ export default function ChatPage() {
               )}
             </InputToolbox>
             <MessageInput
+              value={text}
               attachButton={true}
               onAttachClick={() =>
                 document.getElementById("fileInput")?.click()
@@ -426,24 +472,7 @@ export default function ChatPage() {
                   {
                     onSuccess: (response) => {
                       console.log("Message sent successfully:", response);
-                      // Cập nhật đoạn chat với tin nhắn mới
-                      // if (response?.img) {
-                      //   const newMessage: MessageType = {
-                      //     seen: false,
-                      //     _id: response._id,
-                      //     text: response.text,
-                      //     img: response.img,
-                      //     sender: user?._id || "",
-                      //     createdAt: response.createdAt,
-                      //     updatedAt: response.updatedAt,
-                      //     conversationId: currentConversation._id,
-                      //   };
-                      //   setAllMessages((prevMessages) => [
-                      //     ...prevMessages,
-                      //     newMessage,
-                      //   ]);
-                      // }
-                      // Xóa danh sách file đã tải lên
+
                       setUploadedFiles([]);
                     },
                     onError: (error) => {
@@ -453,6 +482,7 @@ export default function ChatPage() {
                 );
               }}
               placeholder="Type message here"
+              onChange={handleTyping}
             />
           </ChatContainer>
         )}

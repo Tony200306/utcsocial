@@ -18,6 +18,13 @@ export default function RootLayout({
   useEffect(() => {
     hydrateUser();
   }, [hydrateUser]);
+    const user = useUserStore((state) => state.user);
+  if (!user) {
+    if (typeof window !== "undefined") {
+      window.location.href = "/error";
+    }
+    return null;
+  }
   return (
     <FollowProvider>
       <Topbar isMessagePage={true} />

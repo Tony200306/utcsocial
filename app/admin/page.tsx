@@ -123,7 +123,6 @@ export default function Page() {
             </h2>
           </div>
           <div className="flex-col items-center space-y-2 md:flex md:flex-row md:space-x-2 md:space-y-0">
-            <Button className="w-full md:w-auto">Download</Button>
           </div>
         </div>
         <Tabs defaultValue="overview" className="space-y-4">

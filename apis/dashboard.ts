@@ -100,3 +100,24 @@ export const getBarChartNewThreads = async (): Promise<
     throw new Error('Failed to fetch bar chart new threads data');
   }
 };
+
+
+export const getMonthlyTopTagChartData = async (): Promise<
+  { month: string; tagFrequency: number; topTag: string }[]
+> => {
+  try {
+    const response = await axiosClient.get(
+      '/dashboard/monthlytoptagchartdata'
+    );
+
+    if (response.data.error) {
+      throw new Error(response.data.error);
+    }
+    
+    console.log(response.data.data); 
+    return response.data.data;
+  } catch (error: any) {
+    console.error('Error fetching monthly top tag chart data:', error);
+    throw new Error('Failed to fetch monthly top tag chart data');
+  }
+};

@@ -122,7 +122,7 @@ export default function Home({
   return (
     <>
       <h1 className="head-text text-left text-2xl font-bold text-dark-1 dark:text-light-1">
-        Trending Threads
+       Bài viết mới nhất
       </h1>
 
       <section

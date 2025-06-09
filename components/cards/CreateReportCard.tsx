@@ -1,29 +1,22 @@
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
 
 import { Label } from "@/components/ui/label";
 
+import { createReport } from "@/apis/report";
+import { Report } from "@/types/reportType";
+import { Thread } from "@/types/threadType";
+import { useMutation } from "react-query";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
-import { Thread } from "@/types/threadType";
-import { createReport } from "@/apis/report";
-import { useMutation } from "react-query";
 import { Textarea } from "../ui/textarea";
-import { Reportt } from "@/types/reportType";
-import { report } from "process";
 type CreateReportCardProps = {
   isOpen: boolean;
   reportedData: Thread;
@@ -40,20 +33,29 @@ export function CreateReportCard({
         <Dialog open={true} onOpenChange={handleOpenCreateReportChange}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>Report</DialogTitle>
+              <DialogTitle>Báo cáo</DialogTitle>
               <DialogDescription>
-                Thread of user {reportedData.postedBy.name}
+                Bài đăng của người dùng {reportedData.postedBy.name}
               </DialogDescription>
             </DialogHeader>
-            <CreateReportForm reportedData={reportedData} handleOpenCreateReportChange={handleOpenCreateReportChange}/>
+            <CreateReportForm
+              reportedData={reportedData}
+              handleOpenCreateReportChange={handleOpenCreateReportChange}
+            />
           </DialogContent>
         </Dialog>
       )}
     </>
   );
 }
-export function CreateReportForm({ reportedData ,handleOpenCreateReportChange }: { reportedData: Thread ,handleOpenCreateReportChange: () => void}) {
-  const [form, setForm] = React.useState<Reportt>({
+export function CreateReportForm({
+  reportedData,
+  handleOpenCreateReportChange,
+}: {
+  reportedData: Thread;
+  handleOpenCreateReportChange: () => void;
+}) {
+  const [form, setForm] = React.useState<Report>({
     reportedBy: reportedData.postedBy._id,
     content: reportedData._id,
     contentType: "Thread",
@@ -63,15 +65,15 @@ export function CreateReportForm({ reportedData ,handleOpenCreateReportChange }:
   const { mutate } = useMutation({
     mutationFn: createReport,
     onSuccess: (data) => {
-      alert("Report created successfully!");
+      toast("Báo cáo đã được tạo thành công!");
       handleOpenCreateReportChange();
     },
     onError: (error: any) => {
-      alert(error?.message || "Failed to create report");
+      toast.error(error?.message || "Không thể tạo báo cáo");
     },
   });
 
-  const handleChange = (field: keyof Reportt, value: string) => {
+  const handleChange = (field: keyof Report, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -81,31 +83,43 @@ export function CreateReportForm({ reportedData ,handleOpenCreateReportChange }:
   };
 
   return (
-    <Card className="w-[400px]">
-      <CardHeader>
-        <h2 className="text-lg font-semibold">Create a Report</h2>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit}>
-          <div className="grid w-full gap-4">
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="reason">Reason</Label>
-              <Textarea
-                className="h-[250px]"
-                id="reason"
-                value={form.reason}
-                onChange={(e) => handleChange("reason", e.target.value)}
-                placeholder="Why are you reporting this?"
-              />
-            </div>
-          </div>
-        </form>
-      </CardContent>
-      <CardFooter className="flex justify-end">
-        <Button type="submit" onClick={handleSubmit}>
-          Send
-        </Button>
-      </CardFooter>
-    </Card>
+    <div className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="reason" className="text-sm font-medium">
+            Lý do báo cáo
+          </Label>
+          <Textarea
+            id="reason"
+            value={form.reason}
+            onChange={(e) => handleChange("reason", e.target.value)}
+            placeholder="Vui lòng mô tả lý do bạn báo cáo nội dung này..."
+            className="min-h-[120px] resize-none border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+            required
+          />
+          <p className="text-xs text-gray-500">
+            Hãy giúp chúng tôi hiểu vấn đề với nội dung này
+          </p>
+        </div>
+
+        <div className="flex justify-end gap-3 pt-4 border-t">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleOpenCreateReportChange}
+            className="px-6"
+          >
+            Hủy
+          </Button>
+          <Button
+            type="submit"
+            className="px-6 bg-red-600 hover:bg-red-700 text-white"
+            disabled={!form?.reason?.trim()}
+          >
+            Gửi báo cáo
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 }

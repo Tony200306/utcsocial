@@ -1,27 +1,32 @@
 "use client";
 /* eslint-disable tailwindcss/migration-from-tailwind-2 */
-import { fetchSearchSuggestions } from "@/apis/search";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getThreadsBySearch } from "@/apis/search"; // Điều chỉnh import cho đúng đường dẫn API
 import { Input } from "@/components/ui/input";
+import ThreadCard from "@/components/cards/ThreadCard";
 import useUserStore from "@/store/useUserStore";
-import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useQuery } from "react-query";
 
 export default function Page() {
   const [search, setSearch] = useState("");
+  const [showResults, setShowResults] = useState(false);
   const router = useRouter();
-  const { data: userSearch = [], isFetching } = useQuery(
-    ["searchSuggestions", search],
-    () => fetchSearchSuggestions(search),
+
+  const {
+    data: threadsData,
+    isFetching,
+    error,
+    refetch,
+  } = useQuery(
+    ["threadsSearch", search],
+    () => getThreadsBySearch({ query: search }),
     {
-      enabled: !!search, // Chỉ fetch khi search không rỗng
-      staleTime: 1 * 60 * 1000, // Caching 5 phút
-      refetchOnWindowFocus: false, // Không refetch khi focus lại cửa sổ
+      enabled: false, // Chưa fetch khi trạng thái mặc định
+      refetchOnWindowFocus: false,
     }
   );
+
   const user = useUserStore((state) => state.user);
   if (!user) {
     if (typeof window !== "undefined") {
@@ -29,9 +34,10 @@ export default function Page() {
     }
     return null;
   }
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      router.push(`/search/searchResult?query=${search}`);
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && search.trim() !== "") {
+      setShowResults(true);
+      refetch();
     }
   };
 
@@ -40,13 +46,6 @@ export default function Page() {
       <h1 className="head-text mb-10">Tìm kiếm</h1>
       <div className="relative w-full">
         <div className="relative flex gap-1 rounded-lg border bg-light-2 px-4 py-2 shadow-md dark:bg-dark-3">
-          <Image
-            src="/assets/search-gray.svg"
-            alt="search"
-            width={24}
-            height={24}
-            className="object-contain"
-          />
           <Input
             id="text"
             value={search}
@@ -57,30 +56,29 @@ export default function Page() {
           />
         </div>
       </div>
-      {/* Hiển thị danh sách gợi ý nếu có */}
-      {isFetching ? (
-        <div className="z-10 mt-4 w-full rounded-md bg-white bg-opacity-80 shadow-none">
-          <p className="p-2 text-gray-500">Đang tải...</p>
+
+      {isFetching && (
+        <div className="mt-4 w-full">
+          <p>Đang tải...</p>
         </div>
-      ) : (
-        userSearch.length > 0 && (
-          <ul className="z-10 mt-4 w-full rounded-md bg-white bg-opacity-80 shadow-none">
-            {userSearch.map((user: any) => (
-              <Link href={`/profile/${user._id}`} key={user._id}>
-                <li className="flex cursor-pointer items-center gap-2 border-b border-gray-300 p-2 hover:bg-gray-200">
-                  <Avatar className="size-7">
-                    <AvatarImage src={user.profilePic} alt="avatar" />
-                    <AvatarFallback></AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col">
-                    <span>{user.name}</span>
-                    <span className="text-gray-500">@{user.username}</span>
-                  </div>
-                </li>
-              </Link>
-            ))}
-          </ul>
-        )
+      )}
+
+      {error && (
+        <div className="mt-4 w-full">
+          <p className="text-red-500">Có lỗi khi tìm kiếm</p>
+        </div>
+      )}
+
+      {showResults && threadsData && threadsData.threads && (
+        <div className="mt-4 grid grid-cols-1 gap-4">
+          {threadsData.threads.map((thread) => (
+            <ThreadCard
+              key={thread._id}
+              data={thread}
+              threadUrl={`/thread/${thread._id}`}
+            />
+          ))}
+        </div>
       )}
     </section>
   );

@@ -19,27 +19,27 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 const items = [
   {
-    title: "Dashboard",
+    title: "Thống kê",
     url: "/admin",
     icon: DashboardIcon,
   },
   {
-    title: "Report",
+    title: "Báo cáo",
     url: "/admin/report",
     icon: Inbox,
   },
   {
-    title: "Thread",
+    title: "Bài viết",
     url: "/admin/threads",
     icon: Book,
   },
   {
-    title: "User",
+    title: "Người dùng",
     url: "/admin/users",
     icon: User2,
   },
   {
-    title: "Admnin & Moderator",
+    title: "Người quản trị và kiểm duyệt",
     url: "/admin/permissionManagement",
     icon: GroupIcon,
   },

@@ -20,13 +20,13 @@ import { changePassword } from "@/apis/user";
 
 const passwordFormSchema = z
   .object({
-    currentPassword: z.string().min(6, "Current password is required."),
-    newPassword: z.string().min(6, "New password must be at least 6 characters."),
-    confirmPassword: z.string().min(6, "Please confirm your new password."),
+    currentPassword: z.string().min(6, "Mật khẩu hiện tại là bắt buộc."),
+    newPassword: z.string().min(6, "Mật khẩu mới phải có ít nhất 6 ký tự."),
+    confirmPassword: z.string().min(6, "Vui lòng xác nhận mật khẩu mới."),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
     path: ["confirmPassword"],
-    message: "Passwords do not match.",
+    message: "Mật khẩu không khớp.",
   });
 
 type PasswordFormValues = z.infer<typeof passwordFormSchema>;
@@ -44,18 +44,18 @@ export default function ChangePasswordForm() {
 
   const { mutate: mutateChangePassword, isLoading } = useMutation(changePassword, {
     onSuccess: () => {
-      toast("Password updated successfully", {
-        description: "You can now use your new password to login.",
+      toast("Cập nhật mật khẩu thành công", {
+        description: "Bạn có thể sử dụng mật khẩu mới để đăng nhập.",
         action: {
-          label: "Dismiss",
+          label: "Đóng",
           onClick: () => {},
         },
       });
       form.reset();
     },
     onError: (error: any) => {
-      toast.error("Failed to update password", {
-        description: error?.message || "Please try again.",
+      toast.error("Không thể cập nhật mật khẩu", {
+        description: error?.message || "Vui lòng thử lại.",
       });
     },
   });
@@ -75,9 +75,9 @@ export default function ChangePasswordForm() {
           name="currentPassword"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Current Password</FormLabel>
+              <FormLabel>Mật khẩu hiện tại</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="Enter current password" {...field} />
+                <Input type="password" placeholder="Nhập mật khẩu hiện tại" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -89,9 +89,9 @@ export default function ChangePasswordForm() {
           name="newPassword"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>New Password</FormLabel>
+              <FormLabel>Mật khẩu mới</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="Enter new password" {...field} />
+                <Input type="password" placeholder="Nhập mật khẩu mới" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -103,9 +103,9 @@ export default function ChangePasswordForm() {
           name="confirmPassword"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Confirm New Password</FormLabel>
+              <FormLabel>Xác nhận mật khẩu mới</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="Confirm new password" {...field} />
+                <Input type="password" placeholder="Xác nhận mật khẩu mới" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -113,7 +113,7 @@ export default function ChangePasswordForm() {
         />
 
         <Button type="submit" disabled={isLoading}>
-          {isLoading ? "Updating..." : "Change Password"}
+          {isLoading ? "Đang cập nhật..." : "Đổi mật khẩu"}
         </Button>
       </form>
       <Toaster />

@@ -1,5 +1,5 @@
 "use client";
-import { createThread, relyThread } from "@/apis/threads";
+import { createThread } from "@/apis/threads";
 import {
   Dialog,
   DialogContent,
@@ -14,6 +14,7 @@ import {
   HashIcon,
   ImageIcon,
   XIcon,
+  Send,
 } from "lucide-react";
 import useTriggerStore from "@/store/useTriggerStore";
 import { useMutation, useQueryClient } from "react-query";
@@ -51,51 +52,54 @@ export function CreateThreadCard() {
   console.log(currentThread);
   return (
     <Dialog open={isCreateThreadCardOpened} onOpenChange={handleOpenChange}>
-      <DialogContent className="custom-scrollbar max-h-[80%] max-w-[90%] overflow-y-scroll md:h-4/5 lg:w-1/2">
-        <DialogHeader>
-          <DialogTitle className="mb-2 text-center text-2xl font-medium">
-            {currentThread ? "Reply" : "New thread"}
+      <DialogContent className="custom-scrollbar max-h-[85%] max-w-2xl overflow-y-auto rounded-xl border-0 bg-white shadow-2xl dark:bg-gray-900">
+        <DialogHeader className="space-y-4 pb-4">
+          <DialogTitle className="text-center text-2xl font-bold text-gray-900 dark:text-white">
+            {currentThread ? "Trả lời bài viết" : "Tạo bài viết mới"}
           </DialogTitle>
           <DialogDescription>
-            <div className="flex flex-col">
+            <div className="space-y-4">
               {currentThread && (
-                <div className="flex w-fit items-center">
-                  <Avatar className="mr-4 size-12">
-                    <AvatarImage
-                      src={currentThread?.postedBy.profilePic}
-                      alt="avatar"
-                    />
-                    <AvatarFallback>
+                <div className="rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
+                  <div className="flex items-start space-x-3">
+                    <Avatar className="size-10">
                       <AvatarImage
-                        src="https://res.cloudinary.com/muckhotieu/image/upload/v1731805369/l60Hf_ztxub0.png"
+                        src={currentThread?.postedBy.profilePic}
                         alt="avatar"
                       />
-                    </AvatarFallback>
-                  </Avatar>
-                  <h4 className="cursor-pointer text-2xl font-semibold dark:text-light-1">
-                    {currentThread?.postedBy?.name}
-                  </h4>
-                  <span className="ml-3 text-xs text-dark-4">
-                    {currentThread?.createdAt &&
-                      formatDateString(currentThread.createdAt)}
-                  </span>
+                      <AvatarFallback>
+                        <AvatarImage
+                          src="https://res.cloudinary.com/muckhotieu/image/upload/v1731805369/l60Hf_ztxub0.png"
+                          alt="avatar"
+                        />
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2">
+                        <h4 className="font-semibold text-gray-900 dark:text-white">
+                          {currentThread?.postedBy?.name}
+                        </h4>
+                        <span className="text-xs text-gray-500">
+                          {currentThread?.createdAt &&
+                            formatDateString(currentThread.createdAt)}
+                        </span>
+                      </div>
+                      <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
+                        {currentThread?.text}
+                      </p>
+                      {currentThread?.imgs?.length > 0 && (
+                        <div className="mt-3">
+                          <Carousel2 images={currentThread.imgs} />
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
-              <div className="mb-4 flex flex-col justify-center">
-                {currentThread && (
-                  <>
-                    <p className="mt-2 pb-3 text-sm dark:text-light-2">
-                      {currentThread?.text}
-                    </p>
-                    {currentThread?.imgs?.length > 0 && (
-                      <Carousel2 images={currentThread.imgs} />
-                    )}
-                  </>
-                )}
-                <Separator className="my-3 w-full" />
-                {!currentThread && (
-                <div className="flex items-center">
-                  <Avatar className="mr-4 size-12">
+              <Separator className="my-4" />
+              {!currentThread && (
+                <div className="flex items-center space-x-3 p-2">
+                  <Avatar className="size-12">
                     <AvatarImage src={user?.profilePic} alt="avatar" />
                     <AvatarFallback>
                       <AvatarImage
@@ -105,16 +109,19 @@ export function CreateThreadCard() {
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="font-bold text-gray-900">{user?.name}</p>
-                    <p className="text-gray-700">What&apos;s new?</p>
+                    <p className="font-semibold text-gray-900 dark:text-white">
+                      {user?.name}
+                    </p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Bạn đang nghĩ gì?
+                    </p>
                   </div>
                 </div>
               )}
-              </div>
             </div>
           </DialogDescription>
         </DialogHeader>
-        <div className="">
+        <div className="pt-4">
           <CreateThreadForm
             isRely={Boolean(currentThread?._id)}
             parentId={currentThread?._id}
@@ -125,11 +132,13 @@ export function CreateThreadCard() {
     </Dialog>
   );
 }
+
 const formSchema = z.object({
-  text: z.string().min(1, "Text is required"),
+  text: z.string().min(1, "Nội dung không được để trống"),
 });
 
 type FormData = z.infer<typeof formSchema>;
+
 function CreateThreadForm({
   className,
   isRely,
@@ -148,26 +157,25 @@ function CreateThreadForm({
   const queryClient = useQueryClient();
   const router = useRouter();
   const pathname = usePathname();
+
   // API mutation setup with React Query
   const { isLoading: isLoadingCreateNewThread, mutate: mutateCreateNewThread } =
     useMutation(createThread, {
       onSuccess: () => {
-        if(isDialog){
-          console.log(isDialog)
+        if (isDialog) {
+          console.log(isDialog);
           toggleTrigger("isCreateThreadCardOpened");
-        }
-        else{
+        } else {
           router.push(`/`);
         }
         toast({
-          title: "Create Success",
+          title: "Tạo bài viết thành công",
         });
       },
       onError: (error: any) => {
         console.error("Error creating thread:", error);
         const errMessage =
-          error?.response?.data?.error ||
-          "Server error, please try again later";
+          error?.response?.data?.error || "Lỗi máy chủ, vui lòng thử lại sau";
         setErrorMessage(errMessage);
       },
     });
@@ -177,7 +185,7 @@ function CreateThreadForm({
       onSuccess: () => {
         toggleTrigger("isCreateThreadCardOpened");
         toast({
-          title: "Create Success",
+          title: "Trả lời thành công",
         });
         queryClient.invalidateQueries(["comments", parentId]);
         queryClient.refetchQueries(["comments", parentId]);
@@ -188,8 +196,7 @@ function CreateThreadForm({
       onError: (error: any) => {
         console.error("Error creating thread:", error);
         const errMessage =
-          error?.response?.data?.error ||
-          "Server error, please try again later";
+          error?.response?.data?.error || "Lỗi máy chủ, vui lòng thử lại sau";
         setErrorMessage(errMessage);
       },
     });
@@ -201,7 +208,6 @@ function CreateThreadForm({
     },
   });
 
-  // Sử dụng useCallback để tránh việc tái tạo lại hàm
   const handleFileChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const files = event.target.files;
@@ -215,6 +221,7 @@ function CreateThreadForm({
   const handleRemoveFile = useCallback((index: number) => {
     setUploadedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   }, []);
+
   const onSubmit = async (values: FormData) => {
     if (!isRely) {
       console.log("Create new thread", values, uploadedFiles);
@@ -232,28 +239,37 @@ function CreateThreadForm({
   };
 
   const isLoading = isLoadingCreateNewThread || isLoadingRelyThread;
+
   useEffect(() => {
     return () => {
       if (parentId) setCurrentThread(null);
     };
   }, []);
+
   return (
     <Form {...form}>
       <form
-        className={`flex flex-col justify-start gap-10 ${className}`}
+        className={`space-y-6 ${className}`}
         onSubmit={form.handleSubmit(onSubmit)}
       >
-        <div className="mt-4 flex items-center">
-          <ImageIcon
-            className="mr-2 size-6 cursor-pointer text-gray-500"
+        {/* Media Upload Buttons */}
+        <div className="flex items-center space-x-4 rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
+          <button
+            type="button"
+            className="flex items-center space-x-2 rounded-md px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-blue-900/20"
             onClick={() => document.getElementById("fileInput")?.click()}
-          />
-          <FileIcon
-            className="mr-2 size-6 cursor-pointer text-gray-500"
+          >
+            <ImageIcon className="size-4" />
+            <span>Phương tiện</span>
+          </button>
+          <button
+            type="button"
+            className="flex items-center space-x-2 rounded-md px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-green-50 hover:text-green-600 dark:text-gray-300 dark:hover:bg-green-900/20"
             onClick={() => document.getElementById("fileInput")?.click()}
-          />
-          <HashIcon className="mr-2 size-6 text-gray-500" />
-          <MapPin className="mr-2 size-6 text-gray-500" />
+          >
+            <FileIcon className="size-4" />
+            <span>Tệp</span>
+          </button>
         </div>
 
         <input
@@ -267,27 +283,33 @@ function CreateThreadForm({
 
         {/* Display uploaded files */}
         {uploadedFiles.length > 0 && (
-          <div className="mt-4">
-            <h3 className="text-lg font-semibold">Uploaded Files:</h3>
-            <div className="flex space-x-4">
+          <div className="space-y-3">
+            <h3 className="font-semibold text-gray-900 dark:text-white">
+              Tệp đã tải lên:
+            </h3>
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
               {uploadedFiles.map((file, index) => (
-                <div key={file.name + index} className="relative">
-                  <div
-                    className="absolute right-0  top-0 z-10 cursor-pointer"
+                <div key={file.name + index} className="group relative">
+                  <button
+                    type="button"
+                    className="absolute -right-2 -top-2 z-10 rounded-full bg-red-500 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
                     onClick={() => handleRemoveFile(index)}
                   >
-                    <XIcon className="m-1 size-5 cursor-pointer rounded-full text-gray-800 transition-all duration-200 ease-in-out hover:bg-gray-200 hover:text-red-500" />
-                  </div>
+                    <XIcon className="size-4" />
+                  </button>
                   {file.type.startsWith("image") ? (
                     <Image
-                      height={128}
-                      width={128}
+                      height={120}
+                      width={120}
                       src={URL.createObjectURL(file)}
                       alt={`uploaded image ${index}`}
-                      className="rounded object-cover"
+                      className="h-24 w-full rounded-lg object-cover"
                     />
                   ) : (
-                    <video controls className="size-32 rounded object-cover">
+                    <video
+                      controls
+                      className="h-24 w-full rounded-lg object-cover"
+                    >
                       <source
                         src={URL.createObjectURL(file)}
                         type={file.type}
@@ -300,38 +322,58 @@ function CreateThreadForm({
           </div>
         )}
 
+        {/* Text Input */}
         <FormField
           control={form.control}
           name="text"
           render={({ field }) => (
-            <FormItem className="flex w-full flex-col gap-3">
-              <FormLabel className="font-semibold">Thread Text</FormLabel>
+            <FormItem className="space-y-2">
+              <FormLabel className="text-sm font-semibold text-gray-900 dark:text-white">
+                Nội dung bài viết
+              </FormLabel>
               <FormControl>
-                <Textarea rows={10} className="no-focus" {...field} />
+                <Textarea
+                  rows={8}
+                  className="resize-none rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800"
+                  placeholder={
+                    isRely
+                      ? "Viết phản hồi của bạn..."
+                      : "Chia sẻ suy nghĩ của bạn..."
+                  }
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        {/* Error Handling */}
+        {/* Error Message */}
         {errorMessage && (
-          <p className="text-sm font-medium text-red-500 dark:text-red-900">
-            {errorMessage}
-          </p>
+          <div className="rounded-lg bg-red-50 p-3 dark:bg-red-900/20">
+            <p className="text-sm text-red-600 dark:text-red-400">
+              {errorMessage}
+            </p>
+          </div>
         )}
 
-        <div className="flex items-center justify-between">
-          <span className="text-gray-500">Anyone can reply & quote</span>
+        {/* Footer */}
+        <div className="flex items-center justify-between rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
+          <span className="text-sm text-gray-600 dark:text-gray-400">
+            Mọi người có thể trả lời & trích dẫn
+          </span>
           <Button
-            className="rounded px-4 py-2 font-bold text-white"
+            className="!bg-black flex items-center space-x-2 rounded-lg bg-blue-600 px-6 py-2 font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
             loading={isLoading}
+            disabled={isLoading}
           >
-            Post
+            <Send className="size-4" />
+            <span className="">{isRely ? "Trả lời" : "Đăng bài"}</span>
           </Button>
         </div>
       </form>
     </Form>
   );
 }
+
 export default CreateThreadForm;

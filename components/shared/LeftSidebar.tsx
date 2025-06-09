@@ -4,14 +4,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { logout } from "@/apis/user";
 import { sidebarLinks } from "@/constants";
+import useTriggerStore from "@/store/useTriggerStore";
 import useUserStore from "@/store/useUserStore";
-import { Button } from "../custom/button";
 import { IconChevronsLeft } from "@tabler/icons-react";
 import { LogOut } from "lucide-react";
-import useTriggerStore from "@/store/useTriggerStore";
+import { Button } from "../custom/button";
 
 const LeftSidebar = () => {
+  const user = useUserStore((state) => state.user);
   const pathname = usePathname();
   const { LeftSidebarOpened, toggleTrigger } = useTriggerStore();
   const userId = useUserStore((state) => state?.user?._id);
@@ -62,14 +64,25 @@ const LeftSidebar = () => {
           );
         })}
       </div>
-      <div className="mt-10 px-6">
-        <div className="flex cursor-pointer gap-4 p-4">
-          <LogOut className="size-6" />
-          {LeftSidebarOpened && (
-            <p className="dark:text-light-2 max-lg:hidden">Logout</p>
-          )}
+      {user && (
+        <div className="mt-10 px-6">
+          <div className="flex cursor-pointer gap-4 p-4">
+            <LogOut
+              className="size-6"
+              onClick={async () => {
+                await logout().then(() => {
+                  useUserStore.getState().logout();
+                  window.location.reload();
+                });
+              }}
+            />
+            {LeftSidebarOpened && (
+              <p className="dark:text-light-2 max-lg:hidden">Logout</p>
+            )}
+          </div>
         </div>
-      </div>
+      )}
+
       {/* Scrollbar width toggle button */}
       <Button
         onClick={() => toggleTrigger("LeftSidebarOpened")}

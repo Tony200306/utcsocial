@@ -11,32 +11,32 @@ export const sidebarLinks = [
   {
     imgURL: `/assets/home-${theme}.svg`,
     route: "/",
-    label: "Home",
+    label: "Trabf chủ",
   },
   {
     imgURL: `/assets/search-${theme}.svg`,
     route: "/search",
-    label: "Search",
+    label: "Tìm kiếm",
   },
   {
     imgURL: `/assets/heart-${theme}.svg`,
     route: "/activity",
-    label: "Activity",
+    label: "Hoạt động",
   },
   {
     imgURL: `/assets/create-${theme}.svg`,
     route: "/create-thread",
-    label: "Create Thread",
+    label: "Tạo bài viết",
   },
   {
     imgURL: `/assets/user-${theme}.svg`,
     route: "/profile",
-    label: "Profile",
+    label: "Hồ sơ",
   },
   {
     imgURL: `/assets/message-${theme}.svg`,
     route: "/chat",
-    label: "Chat",
+    label: "Tin nhắn",
   },
 ];
 

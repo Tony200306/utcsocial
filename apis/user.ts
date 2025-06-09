@@ -95,7 +95,12 @@ export const logout = async (): Promise<{ message: string }> => {
   const response = await axiosClient.post("/users/logout", {}, {
     withCredentials: true, // để gửi kèm cookie JWT
   });
-
+  console.log("Logout response:", response);
+  if (response.status === 200) {
+    console.log("Logout succ===========essful, clearing cookies");
+    console.log("Current cookies:", document.cookie);
+    document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  }
   if (response.data.error) {
     throw new Error(response.data.error);
   }
@@ -218,15 +223,26 @@ export const usersIamFollowing = async (): Promise<User[]> => {
 };
 
 
-export const getUsersFollowingMe = async (): Promise<User[]> => {
+export const getUserFollowingById = async ({
+  id
+}: {
+  id: string;
+}): Promise<User[]> => {
   try {
-    const response = await axiosClient.get(`/users/suggested/usersFollowingMe`);
+    const response = await axiosClient.get(
+      `/users/suggested/usersFollowingById`,
+      {
+        params: { id }
+      }
+    );
     if (response.data.error) {
       throw new Error(response.data.error);
     }
-    return response.data.followers as User[];
+    return response.data.following as User[];
   } catch (error: any) {
     console.error("Error fetching users following me:", error);
-    throw new Error(error?.response?.data?.message || "Failed to fetch users following me");
+    throw new Error(
+      error?.response?.data?.message || "Failed to fetch users following me"
+    );
   }
 };

@@ -58,14 +58,14 @@ export default function SignIn() {
           >
             <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
           </svg>
-          UTC Threads
+          UTC Forum
         </div>
         <Logo className="relative m-auto" size={400} />
         <div className="relative z-20 mt-auto">
           <blockquote className="space-y-2">
             <p className="text-lg">
-              &ldquo;Education is the most powerful weapon which you can use to
-              change the world.&rdquo;
+              &ldquo;Giáo dục là vũ khí mạnh nhất mà bạn có thể sử dụng để
+              thay đổi thế giới.&rdquo;
             </p>
             <footer className="text-sm">Nelson Mandela</footer>
           </blockquote>
@@ -74,38 +74,22 @@ export default function SignIn() {
       <div className="lg:p-8">
         <div className="mx-auto flex w-full flex-col justify-center space-y-2 sm:w-[350px]">
           <div className="flex flex-col space-y-2 text-left">
-            <h1 className="text-4xl font-semibold tracking-tight">Login</h1>
+            <h1 className="text-4xl font-semibold tracking-tight">Đăng nhập</h1>
             <p className="pt-2 text-sm text-muted-foreground">
-              You don&apos;t have an account yet?{" "}
+              Bạn chưa có tài khoản?{" "}
               <Link
                 className="underline underline-offset-4 hover:text-primary"
                 href={"./sign-up"}
               >
-                Sign up here
+                Đăng ký tại đây
               </Link>
               .
             </p>
           </div>
           <UserAuthForm />
-          <p className="px-8 text-center text-sm text-muted-foreground">
-            By clicking login, you agree to our{" "}
-            <Link
-              href="/terms"
-              className="underline underline-offset-4 hover:text-primary"
-            >
-              Terms of Service
-            </Link>{" "}
-            and{" "}
-            <Link
-              href="/privacy"
-              className="underline underline-offset-4 hover:text-primary"
-            >
-              Privacy Policy
-            </Link>
-            .
-          </p>
         </div>
       </div>
     </div>
   );
 }
+

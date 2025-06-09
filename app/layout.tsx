@@ -17,6 +17,7 @@ export default function RootLayout({
   }, []);
   return (
     <ReactQueryProvider>
+      
       <html lang="en">
         <body className="h-full overflow-auto bg-light-2 dark:bg-dark-2">
           {children}

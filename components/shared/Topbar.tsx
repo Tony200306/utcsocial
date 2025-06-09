@@ -1,11 +1,12 @@
 "use client";
+import { logout } from "@/apis/user";
+import useTriggerStore from "@/store/useTriggerStore";
+import useUserStore from "@/store/useUserStore";
+import { Slack as Logo, LogOut } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { LinkIcon, Slack as Logo, LogOut, Settings } from "lucide-react";
-import useTriggerStore from "@/store/useTriggerStore";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import useUserStore from "@/store/useUserStore";
 import { usePathname, useRouter } from "next/navigation";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import {
   Menubar,
   MenubarContent,
@@ -14,10 +15,10 @@ import {
   MenubarSeparator,
   MenubarTrigger,
 } from "../ui/menubar";
-import { logout } from "@/apis/user";
 function Topbar({ isMessagePage }: { isMessagePage?: boolean }) {
   const { LeftSidebarOpened } = useTriggerStore();
   const avatarUrl = useUserStore((state) => state.user?.profilePic);
+  const user = useUserStore((state) => state.user);
   const pathname = usePathname();
   const isProfilePage = pathname.includes("/profile");
   const router = useRouter();
@@ -68,32 +69,27 @@ function Topbar({ isMessagePage }: { isMessagePage?: boolean }) {
                 </Avatar>
               </MenubarTrigger>
               <MenubarContent align="end">
-                <MenubarItem className="flex cursor-default items-center justify-between py-2">
-                  Settings
-                  <Settings className="ml-2 size-4  cursor-pointer" />
-                </MenubarItem>
-
-                <MenubarItem
-                  onClick={() => {
-                    handleLogout();
-                  }}
-                  className="flex cursor-default items-center justify-between py-2"
-                >
-                  Log out
-                  <LogOut className="ml-2 size-4  cursor-pointer" />
-                </MenubarItem>
-
-                <MenubarSeparator />
-
-                <MenubarItem
-                  onClick={() => {
-                    /* Logic for copying link */
-                  }}
-                  className="flex cursor-default items-center justify-between py-2"
-                >
-                  Copy link
-                  <LinkIcon className="ml-2 size-4  cursor-pointer" />
-                </MenubarItem>
+                {user && (
+                  <MenubarItem
+                    onClick={() => {
+                      handleLogout();
+                    }}
+                    className="flex cursor-default items-center justify-between py-2"
+                  >
+                    Log out
+                    <LogOut className="ml-2 size-4  cursor-pointer" />
+                  </MenubarItem>
+                )}{" "}
+                {!user && (
+                 <MenubarItem
+                    onClick={() => {
+                      router.push("/sign-in");
+                    }}
+                    className="flex cursor-default items-center justify-between py-2"
+                  >
+                    Đăng nhập
+                  </MenubarItem>
+                )}{" "}
               </MenubarContent>
             </MenubarMenu>
           </Menubar>
