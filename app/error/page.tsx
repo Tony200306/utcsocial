@@ -34,6 +34,7 @@ const ErrorPage = () => {
           <button
             onClick={handleGoToLogin}
             style={{
+              margin: "10px 10px",
               padding: "10px 20px",
               fontSize: "1rem",
               backgroundColor: "#1976d2",
